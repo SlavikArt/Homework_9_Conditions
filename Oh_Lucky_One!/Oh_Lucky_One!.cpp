@@ -152,13 +152,22 @@ int main()
 	};
 
 	string answer;
+
 	int money = 0;
 	int fixed_money = 0;
 	int n = 0;
 
+	bool hints = true;
+	bool fifty_fifty = true;
+	bool friend_call = true;
+	bool three_wise_men = true;
+
 	for (int i = 0; i < SIZE1; i++)
 	{
 		int answer = 0;
+		int right_answer = 0;
+		int one_answer;
+		int two_answer;
 
 		n = myRandom(0, SIZE1 - 1);
 
@@ -176,8 +185,133 @@ int main()
 			cout << j << ")" << arr[n][0][j] << "\n";
 		}
 
+		if (hints)
+		{
+			cout << "\nПодсказки:\n";
+			if (fifty_fifty)
+			{
+				cout << "5)50/50\n";
+			}
+			if (friend_call)
+			{
+				cout << "6)Звонок другу\n";
+			}
+			if (three_wise_men)
+			{
+				cout << "7)Три мудреца\n";
+			}
+		}
+		else
+		{
+			cout << "\nПодсказки закончились.\n";
+		}
+		
+
 		cout << "\nВведите: ";
 		cin >> answer;
+
+		if (answer == 5 && fifty_fifty)
+		{
+			// 50/50: подсказка дает нам 2 ответа, 1 из которых правильный
+			for (int h = 1; h < SIZE3; h++)
+			{
+				if (arr[n][1][h] == "1")
+				{
+					right_answer = h;
+				}
+			}
+
+			one_answer = right_answer;
+
+			two_answer = myRandom(1, 4);
+
+			while (two_answer == one_answer)
+			{
+				two_answer = myRandom(1, 4);
+			}
+
+			cout << "\n50/50:\n\n";
+
+			cout << one_answer << ")" << arr[n][0][one_answer] << "\n";
+			cout << two_answer << ")" << arr[n][0][two_answer] << "\n";
+			
+			cout << "\nВведите: ";
+			cin >> answer;
+
+			fifty_fifty = false;
+		}
+		else if (answer == 6 && friend_call)
+		{
+			// Звонок другу: подсказка дает нам 1 ответ, который правильный с вероятностью 70%
+			for (int h = 1; h < SIZE3; h++)
+			{
+				if (arr[n][1][h] == "1")
+				{
+					right_answer = h;
+				}
+			}
+
+			if (myRandom(0, 100) <= 70)
+			{
+				one_answer = right_answer;
+			}
+			else
+			{
+				one_answer = myRandom(1, 4);
+				while (one_answer == right_answer)
+				{
+					one_answer = myRandom(1, 4);
+				}
+			}
+
+			cout << "\nЗвонок другу:\n\n";
+
+			cout << one_answer << ")" << arr[n][0][one_answer] << "\n";
+
+			cout << "\nВведите: ";
+			cin >> answer;
+
+			friend_call = false;
+		}
+		else if (answer == 7 && three_wise_men)
+		{
+			// Три Мудреца: подсказка дает нам 3 ответа, каждый из которых с вероятностью 60% правильный
+			for (int h = 1; h < SIZE3; h++)
+			{
+				if (arr[n][1][h] == "1")
+				{
+					right_answer = h;
+				}
+			}
+
+			one_answer = right_answer;
+
+			two_answer = myRandom(1, 4);
+
+			while (two_answer == one_answer)
+			{
+				two_answer = myRandom(1, 4);
+			}
+
+			cout << "\nТри Мудреца:\n\n";
+
+			for (int g = 1; g <= 3; g++)
+			{
+				if (myRandom(0, 100) <= 60)
+				{
+					cout << "Мудрец " << g << ": " << one_answer << ")" << arr[n][0][one_answer] << "\n";
+				}
+				else
+				{
+					cout << "Мудрец " << g << ": " << two_answer << ")" << arr[n][0][two_answer] << "\n";
+				}
+			}
+
+			cout << "\nВведите: ";
+			cin >> answer;
+
+			three_wise_men = false;
+		}
 
 		if (arr[n][1][answer] == "1")
 		{
@@ -213,6 +347,11 @@ int main()
 		}
 
 		arr[n][0][0] = "0";
+
+		if (!fifty_fifty && !friend_call && !three_wise_men)
+		{
+			hints = false;
+		}
 
 		system("pause");
 		system("cls");
