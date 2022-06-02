@@ -8,6 +8,17 @@ int myRandom(int min, int max) {
 	return rand() % k + min;
 }
 
+void setOtherValue(int *one, int *two, int *three, int *four) {
+	do
+	{
+		*two = myRandom(1, 4);
+		*three = myRandom(1, 4);
+		*four = myRandom(1, 4);
+	}
+	while (*two == *one || *two == *three || *two == *four ||
+		*one == *three || *one == *four || *four == *three);
+}
+
 void giveMoney(int i, int *mon, int *fix_mon) {
 	switch (i)
 	{
@@ -207,17 +218,27 @@ int main()
 	int fixed_money = 0;
 	int n = 0;
 
+	int one_answer;
+	int two_answer;
+	int three_answer;
+	int four_answer;
+
+	int one_answer_percent;
+	int two_answer_percent;
+	int three_answer_percent;
+	int four_answer_percent;
+
 	bool hints = true;
 	bool fifty_fifty = true;
 	bool friend_call = true;
 	bool three_wise_men = true;
+	bool audience_help = true;
 
 	for (int i = 0; i < 15; i++)
 	{
 		int answer = 0;
 		int right_answer = 0;
-		int one_answer;
-		int two_answer;
+		int chance = 0;
 
 		n = myRandom(0, SIZE1 - 1);
 
@@ -249,6 +270,10 @@ int main()
 			if (three_wise_men)
 			{
 				cout << "7)Три мудреца\n";
+			}
+			if (audience_help)
+			{
+				cout << "8)Помощь зала\n";
 			}
 		}
 		else
@@ -362,6 +387,60 @@ int main()
 
 			three_wise_men = false;
 		}
+		else if (answer == 8 && audience_help)
+		{
+			// Помощь зала: подсказка дает нам 4 ответа, 
+			for (int h = 1; h < SIZE3; h++)
+			{
+				if (arr[n][1][h] == "1")
+				{
+					right_answer = h;
+				}
+			}
+
+			do
+			{
+				one_answer_percent = myRandom(32, 56);
+				two_answer_percent = myRandom(20, 31);
+				three_answer_percent = (100 - one_answer_percent - two_answer_percent) / 2;
+				four_answer_percent = 100 - one_answer_percent - two_answer_percent - three_answer_percent;
+			} while (three_answer_percent == four_answer_percent);
+
+			chance = myRandom(0, 100);
+
+			if (chance < 10)
+			{
+				four_answer = right_answer;
+				setOtherValue(&four_answer, &two_answer, &three_answer, &one_answer);
+			}
+			else if (chance > 90)
+			{
+				three_answer = right_answer;
+				setOtherValue(&three_answer, &two_answer, &one_answer, &four_answer);
+			}
+			else if (chance >= 10 && chance < 35)
+			{
+				two_answer = right_answer;
+				setOtherValue(&two_answer, &one_answer, &three_answer, &four_answer);
+			}
+			else
+			{
+				one_answer = right_answer;
+				setOtherValue(&one_answer, &two_answer, &three_answer, &four_answer);
+			}
+
+			cout << "\nПомощь зала:\n\n";
+
+			cout << three_answer_percent << "% - " << three_answer << ")" << arr[n][0][three_answer] << "\n";
+			cout << two_answer_percent << "% - " << two_answer << ")" << arr[n][0][two_answer] << "\n";
+			cout << one_answer_percent << "% - " << one_answer << ")" << arr[n][0][one_answer] << "\n";
+			cout << four_answer_percent << "% - " << four_answer << ")" << arr[n][0][four_answer] << "\n";
+
+			cout << "\nВведите: ";
+			cin >> answer;
+			
+			audience_help = false;
+		}
 
 		if (arr[n][1][answer] == "1")
 		{
@@ -398,7 +477,7 @@ int main()
 
 		arr[n][0][0] = "0";
 
-		if (!fifty_fifty && !friend_call && !three_wise_men)
+		if (!fifty_fifty && !friend_call && !three_wise_men && !audience_help)
 		{
 			hints = false;
 		}
